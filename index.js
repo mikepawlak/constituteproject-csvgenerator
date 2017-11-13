@@ -98,22 +98,33 @@ function createConstText(country) {
 //write to csv file(array)
 //turns JSON into csv data and writes to file
 function generateCSV(content) {
-	//write to file and create CSV
-	//write created object to file for analyzing
-	fs.writeFile(writePath, JSON.stringify(content), function(err) {
-		if (err) {
-			console.log(" Error in saving to " + writePath + ":");
+	//JSON to CSV
+	jsonexport(content,function(err, csv){
+    if(err) {
+			console.log(" Error in generating csv");
 			console.log(err);
 			process.exit();
-		}
-		else if (errors !== 0) {
-			console.log("Error in generation, please check the input file and try again");
-			process.exit();
 		} else {
-			console.log(" Document saved to " + writePath);
-			process.exit();
+			//write to file and create CSV
+			//write created object to file for analyzing
+			var localWritePath = writePath + ".csv";
+			fs.writeFile(localWritePath, csv, function(err) {
+				if (err) {
+					console.log(" Error in saving to " + writePath + ":");
+					console.log(err);
+					process.exit();
+				}
+				else if (errors !== 0) {
+					console.log("Error in generation, please check the input file and try again");
+					process.exit();
+				} else {
+					console.log(" Document saved to " + writePath);
+					process.exit();
+				}
+			});
 		}
-	});
+
+});
 }
 
 
