@@ -17,7 +17,6 @@ var countryArray = [];
 //array to contain created objects for csv
 var objArray = [];
 //read failures, for exiting gracefully if a country is not read
-var errors = 0;
 var errorArray = [];
 
 
@@ -31,8 +30,7 @@ function createConstText(country) {
 	req.get(id_url, function(err, res, body) {
 		if (err) {
 			console.log("Error in generation...");
-			errors += 1;
-			errorArray.push(country);
+			errorArray.push({call: "getCountryID with " + country, error: err});
 			objArray.push({});
 			bar.update(objArray.length);
 		} else {
@@ -42,8 +40,7 @@ function createConstText(country) {
 				//make call to constitute API, get constitution, full
 				req.get(url, function(err, res, body) {
 					if (err) {
-						errors += 1;
-						errorArray.push(err);
+						errorArray.push({call: "getConstituition", error: err});
 						objArray.push({});
 						bar.update(objArray.length);
 					} else {
@@ -57,10 +54,12 @@ function createConstText(country) {
 					 var $ = cheerio.load(sanatized);
 					 var title = $('h1').text();
 
-						//remove tabs and multicharacter spaces
-						sanatized = sanatized.replace(/\s\s+/g, ' ');
 						//create text from html (this was totally stolen from SO https://stackoverflow.com/questions/822452/strip-html-from-text-javascript)
 						sanatized = sanatized.replace(/<(?:.|\n)*?>/gm, '');
+						//remove tabs and multicharacter spaces
+						sanatized = sanatized.replace(/\s\s+/g, ' ');
+						//remove punctuation
+						sanatized = sanatized.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
 						objArray.push({
 							title: title,
 							body: sanatized
@@ -69,10 +68,13 @@ function createConstText(country) {
 							bar.update(countryArray.length);
 							bar.stop();
 							console.log(" ");
-							if (errors === 0) {
+							if (errorArray.length === 0) {
 								console.log(" Generation complete, saving to  document...");
 							} else {
-								console.log("Generation error...");
+								console.log("Generation error... \n");
+								for (var i = 0; i < errorArray.length; i++) {
+									console.log(errorArray[i]);
+								}
 							}
 							generateCSV(objArray);
 						} else {
@@ -83,8 +85,7 @@ function createConstText(country) {
 					}
 				});
 			} else {
-				errors += 1;
-				errorArray.push(err);
+				errorArray.push({call: "getConstitution", error: country + " not found."});
 				objArray.push({});
 				bar.update(objArray.length);
 			}
@@ -114,7 +115,7 @@ function generateCSV(content) {
 					console.log(err);
 					process.exit();
 				}
-				else if (errors !== 0) {
+				else if (errorArray.length !== 0) {
 					console.log("Error in generation, please check the input file and try again");
 					process.exit();
 				} else {
@@ -128,7 +129,7 @@ function generateCSV(content) {
 }
 
 
-function main() {
+(function main() {
 	//read import file
 	fs.readFile(readPath, 'utf8', function (err, body) {
 		if (err) {
@@ -144,8 +145,4 @@ function main() {
 			}
 		}
 	});
-}
-
-
-
-main();
+})();
