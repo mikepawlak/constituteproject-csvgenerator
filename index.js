@@ -1,17 +1,23 @@
-//dependencies
+//DEPENDENCIES
+//-------------
 var req = require("request");
 var fs = require("fs");
+//for reading html, emulate DOM nodes
 var cheerio = require("cheerio");
+//for JSON -> CSV
 var jsonexport = require('jsonexport');
 //for output prettyness
 var progress = require('cli-progress');
 var bar = new progress.Bar({}, progress.Presets.shades_classic);
 
-//config variables, optionally passed in config file (one day)
+//CONFIG
+//--------------
+//read/write variables, optionally passed in as args or config file (one day)
 var writePath = "./output/output";
 var readPath = "./input/input.txt";
 
-
+//GLOBLAL VARIABLES
+//---------------
 //these will be in an array of all countries observed
 var countryArray = [];
 //array to contain created objects for csv
@@ -19,7 +25,8 @@ var objArray = [];
 //read failures, for exiting gracefully if a country is not read
 var errorArray = [];
 
-
+//FUNCTIONS
+//---------------
 
 //getConstText(obj)
 /* gets full text string for a country id from constitute.org
@@ -94,8 +101,6 @@ function createConstText(country) {
 
 }
 
-
-
 //write to csv file(array)
 //turns JSON into csv data and writes to file
 function generateCSV(content) {
@@ -115,7 +120,8 @@ function generateCSV(content) {
 					console.log(err);
 					process.exit();
 				}
-				else if (errorArray.length !== 0) {
+				else if (errorArray.length !== 0
+				) {
 					console.log("Error in generation, please check the input file and try again");
 					process.exit();
 				} else {
@@ -128,7 +134,8 @@ function generateCSV(content) {
 });
 }
 
-
+//MAIN
+//--------------
 (function main() {
 	//read import file
 	fs.readFile(readPath, 'utf8', function (err, body) {
