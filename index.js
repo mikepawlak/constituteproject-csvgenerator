@@ -48,7 +48,7 @@ function createConstText(country) {
 				//make call to constitute API, get constitution, full
 				req.get(url, function(err, res, body) {
 					if (err) {
-						errorArray.push({call: "getConstituition", error: err});
+						errorArray.push({call: "getConstitution", error: err});
 						objArray.push({});
 						bar.update(objArray.length);
 					} else {
@@ -103,7 +103,7 @@ function createConstText(country) {
 function generateCSV(content) {
 	//output JSON for analysis
 	var localWritePath = writePath + ".json";
-	fs.writeFile(localWritePath, json, function(err) {
+	fs.writeFile(localWritePath, JSON.stringify(content), function(err) {
 		console.log("JSON file created...");
 	});
 	//JSON to CSV
