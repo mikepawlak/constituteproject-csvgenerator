@@ -25,6 +25,7 @@ var objArray = [];
 //read failures, for exiting gracefully if a country is not read
 var errorArray = [];
 
+
 //FUNCTIONS
 //---------------
 
@@ -51,22 +52,18 @@ function createConstText(country) {
 						objArray.push({});
 						bar.update(objArray.length);
 					} else {
-
-
 						var sanatized = JSON.parse(body).html;
-
-
 						//I don't have access to the CountryObj since I can't pass it as an argument and all this promise-y stuff
 						//means the stored variable will likely be behind so I need to build it back up from the html that's returned
 					 var $ = cheerio.load(sanatized);
 					 var title = $('h1').text();
 
-						//create text from html (this was totally stolen from SO https://stackoverflow.com/questions/822452/strip-html-from-text-javascript)
+						//create text from html
 						sanatized = sanatized.replace(/<(?:.|\n)*?>/gm, '');
 						//remove tabs and multicharacter spaces
 						sanatized = sanatized.replace(/\s\s+/g, ' ');
 						//remove punctuation
-						sanatized = sanatized.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+						sanatized = sanatized.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,'');
 						objArray.push({
 							title: title,
 							body: sanatized
@@ -101,9 +98,14 @@ function createConstText(country) {
 
 }
 
-//write to csv file(array)
+//generateCSV(json)
 //turns JSON into csv data and writes to file
 function generateCSV(content) {
+	//output JSON for analysis
+	var localWritePath = writePath + ".json";
+	fs.writeFile(localWritePath, json, function(err) {
+		console.log("JSON file created...");
+	});
 	//JSON to CSV
 	jsonexport(content,function(err, csv){
     if(err) {
@@ -113,15 +115,14 @@ function generateCSV(content) {
 		} else {
 			//write to file and create CSV
 			//write created object to file for analyzing
-			var localWritePath = writePath + ".csv";
+			localWritePath = writePath + ".csv";
 			fs.writeFile(localWritePath, csv, function(err) {
 				if (err) {
 					console.log(" Error in saving to " + writePath + ":");
 					console.log(err);
 					process.exit();
 				}
-				else if (errorArray.length !== 0
-				) {
+				else if (errorArray.length !== 0) {
 					console.log("Error in generation, please check the input file and try again");
 					process.exit();
 				} else {

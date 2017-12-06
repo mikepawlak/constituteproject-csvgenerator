@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "analyze": "node analyze.js"
   },
   "author": "",
   "license": "ISC",
@@ -11,7 +12,8 @@
     "cheerio": "^1.0.0-rc.2",
     "cli-progress": "^1.6.0",
     "jsonexport": "^2.0.11",
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "text-miner": "^1.0.5"
   },
   "devDependencies": {},
   "description": ""
